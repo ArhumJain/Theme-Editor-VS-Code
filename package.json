@@ -19,7 +19,26 @@
 				"command": "theme-editor.helloWorld",
 				"title": "Hello World"
 			}
-		]
+		],
+		"viewsContainers": {
+			"activitybar": [
+			  {
+				"id": "theme-explorer",
+				"title": "My Themes",
+				"icon": "src/palette.svg"
+			  }
+			]
+		},
+		"views": {
+			"theme-explorer": [
+				{
+					"id": "view",
+					"name": "",
+					"icon": "src/palette.svg",
+					"contextualTitle": "Package Explorer"
+				}
+			]
+		  }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
