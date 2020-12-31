@@ -1,82 +1,55 @@
-// import * as vscode from 'vscode'
+import * as vscode from "vscode"
 
-// export class NodeDependenciesProvider implements vscode.TreeDataProvider<Dependency> {
-//     getTreeItem(element: Dependency): vscode.TreeItem {
-//       return element;
-//     }
-  
-//     getChildren(element?: Dependency): Thenable<Dependency[]> {
-//       if (element) {
-//         return Promise.resolve(
-//           this.getDepsInPackageJson(
-//             path.join(this.workspaceRoot, 'node_modules', element.label, 'package.json')
-//           )
-//         );
-//       } else {
-//         const packageJsonPath = path.join(this.workspaceRoot, 'package.json');
-//         if (this.pathExists(packageJsonPath)) {
-//           return Promise.resolve(this.getDepsInPackageJson(packageJsonPath));
-//         } else {
-//           vscode.window.showInformationMessage('Workspace has no package.json');
-//           return Promise.resolve([]);
-//         }
-//       }
-//     }
-  
-//     /**
-//      * Given the path to package.json, read all its dependencies and devDependencies.
-//      */
-//     private getDepsInPackageJson(packageJsonPath: string): Dependency[] {
-//       if (this.pathExists(packageJsonPath)) {
-//         const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-  
-//         const toDep = (moduleName: string, version: string): Dependency => {
-//           if (this.pathExists(path.join(this.workspaceRoot, 'node_modules', moduleName))) {
-//             return new Dependency(
-//               moduleName,
-//               version,
-//               vscode.TreeItemCollapsibleState.Collapsed
-//             );
-//           } else {
-//             return new Dependency(moduleName, version, vscode.TreeItemCollapsibleState.None);
-//           }
-//         };
-  
-//         const deps = packageJson.dependencies
-//           ? Object.keys(packageJson.dependencies).map(dep =>
-//               toDep(dep, packageJson.dependencies[dep])
-//             )
-//           : [];
-//         const devDeps = packageJson.devDependencies
-//           ? Object.keys(packageJson.devDependencies).map(dep =>
-//               toDep(dep, packageJson.devDependencies[dep])
-//             )
-//           : [];
-//         return deps.concat(devDeps);
-//       } else {
-//         return [];
-//       }
-//     }
-  
-//     private pathExists(p: string): boolean {
-//       try {
-//         fs.accessSync(p);
-//       } catch (err) {
-//         return false;
-//       }
-//       return true;
-//     }
-//   }
-  
+export class ThemesProvider implements vscode.TreeDataProvider<Theme> {
+    getTreeItem(element: Theme): vscode.TreeItem {
+        return element
+    }
 
-// class Dependency extends vscode.TreeItem {
-//     constructor(
-//       public readonly label: string,
-//       private version: string,
-//       public readonly collapsibleState: vscode.TreeItemCollapsibleState
-//     ) {
-//       super(label, collapsibleState);
-//       this.tooltip = `${this.label}-${this.version}`;
-//       this.description = this.version;
-//     }
-// }
+    getChildren(element?: Theme): Thenable<Theme[]> {
+        if (element) return Promise.resolve([])
+        return Promise.resolve(this.getAllThemes())
+    }
+
+    /**
+     * Given the path to package.json, read all its dependencies and devDependencies.
+    */
+    // private getChildrenOfElement(element: Theme): Theme[] {
+    //     let themes: Theme[] = []
+    //     const elLabel = element.label
+    //     vscode.extensions.getExtension()
+    //     return themes
+    // }
+
+    private getExtension(label: string) {
+
+    }
+
+    private getAllThemes(): Theme[] {
+        let themes: Theme[] = []
+        vscode.extensions.all.forEach(ext => {
+            const contributesThemes = ext.packageJSON.contributes ? (ext.packageJSON.contributes.themes ? ext.packageJSON.contributes.themes : undefined) : undefined
+            if (contributesThemes) {
+                for (var i = 0; i < contributesThemes.length; i++) {
+                    const label = contributesThemes[i].label;
+                    // console.log(contributesThemes[i])
+                    // const uiTheme = (contributesThemes[i].uiTheme === 'vs-dark') ? 'dark' : 'light';
+                    // const extensionType = ext.packageJSON.isBuiltin ? 'Built-in' : 'External';
+                    // console.log(`${extensionType} extension '${ext.id}' contributes ${uiTheme} theme '${label}'`);
+                    const theme = new Theme(label)
+                    themes.push(theme)
+                 }
+            }
+        })
+        return themes
+    }
+}
+
+class Theme extends vscode.TreeItem {
+    constructor(
+        public readonly label: string,
+    ) {
+        super(label);
+        this.tooltip = this.label;
+        this.description = this.label;
+    }
+}

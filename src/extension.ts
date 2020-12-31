@@ -1,40 +1,53 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from 'vscode'
+import { DefaultThemes } from './DefaultThemes'
+import { ThemesProvider } from './ThemeListProvider'
 
-// this method is called when your extension is activatedm
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "theme-editor" is now active!');
+	const command = vscode.commands.registerCommand('theme-editor.helloWorld', () => {
+		const panel = vscode.window.createWebviewPanel(
+			'editor',
+			'Editor',
+			vscode.ViewColumn.One,
+			{}
+		)
 
-    vscode.extensions.all.forEach(ext => {
-        const contributesThemes = ext.packageJSON.contributes ? (ext.packageJSON.contributes.themes ? ext.packageJSON.contributes.themes : undefined) : undefined;
-        if (contributesThemes) {
-            for (var i = 0; i < contributesThemes.length; i++) {
-                const label = contributesThemes[i].label;
-                const uiTheme = (contributesThemes[i].uiTheme === 'vs-dark') ? 'dark' : 'light';
-                const extensionType = ext.packageJSON.isBuiltin ? 'Built-in' : 'External';
-                vscode.window.showInformationMessage(`${extensionType} extension '${ext.id}' contributes ${uiTheme} theme '${label}'`);
-             }
-        }
-    });
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('theme-editor.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-	vscode.window.showInformationMessage(vscode.extensions.all[0].packageJSON.contributes.themes.id)
-		vscode.window.showInformationMessage('Hello World from Theme Editor!');
-	});
+		panel.webview.html = `<!doctype html>
+		<html lang="en">
+		<head>
+		  <meta charset="utf-8">
+		
+		  <title>The HTML5 Herald</title>
+		  <meta name="description" content="The HTML5 Herald">
+		  <meta name="author" content="SitePoint">
+		
+		
+		</head>
+		
+		<body>
+			<h1> Simp Father </h1>
+			<button> Click Me </button>
+		</body>
+		</html>`
+	})
+	const DataProvider = new ThemesProvider() 
+	const TreeProvider = vscode.window.registerTreeDataProvider(
+		'view',
+		DataProvider
+	)
 
-	context.subscriptions.push(disposable);
-}
-function commentLint(){
-	vscode.commands.executeCommand('theme-editor.helloWorld')
+	const treeView = vscode.window.createTreeView("view", {
+		treeDataProvider: DataProvider
+	})
+	treeView.onDidChangeSelection(_ => {
+		const label = DefaultThemes.get(treeView.selection[0].label) || treeView.selection[0].label
+		console.log(label)
+		vscode.workspace.getConfiguration('workbench')
+			.update('colorTheme', label, vscode.ConfigurationTarget.Global)
+	})
+
+	context.subscriptions.push(TreeProvider, command)
 }
 
 // this method is called when your extension is deactivated

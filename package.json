@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:theme-editor.helloWorld"
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -26,6 +26,7 @@
 				"id": "theme-explorer",
 				"title": "My Themes",
 				"icon": "src/palette.svg"
+				
 			  }
 			]
 		},
