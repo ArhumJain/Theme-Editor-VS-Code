@@ -4,6 +4,16 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"script": "svelte:compile",
+			"label": "svelte-compile",
+			"type": "npm"
+		},
+		{
+			"script": "svelte:compile-dev",
+			"label": "svelte-compile-dev",
+			"type": "npm"
+		},
+		{
 			"type": "npm",
 			"script": "watch",
 			"problemMatcher": "$tsc-watch",
